@@ -7,8 +7,9 @@ public class Game : MonoBehaviour
 
 
     [SerializeField] private EventHub events;
+    [SerializeField] private Money money;
     public EventHub Events => events;
-
+    public Money Money => money;
 
     private void Awake()
     {
