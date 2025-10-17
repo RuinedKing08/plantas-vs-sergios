@@ -1,40 +1,54 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Game : MonoBehaviour
 {
     public static Game Instance { get; private set; }
 
+    [Header("Player Stats")]
+    [SerializeField] private int startingMoney = 200;
+    [SerializeField] private int startingLives = 20;
 
-    [SerializeField] private EventHub events;
-    [SerializeField] private Money money;
-    public EventHub Events => events;
-    public Money Money => money;
+    public UnityEvent<int> OnMoneyChanged;
+    public UnityEvent<int> OnLivesChanged;
+
+    public int money;
+    public int lives;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
+        if (Instance != null) Destroy(gameObject);
+        else Instance = this;
+
+        money = startingMoney;
+        lives = startingLives;
     }
-}
 
+    public bool HasResources(int amount) => money >= amount;
 
-public sealed class EventHub : MonoBehaviour
-{
-    public event Action OnEnemyKilled;
-    public event Action OnTowerBuilt;
-    public event Action OnBaseDestroyed;
+    public void AddResources(int amount)
+    {
+        money += amount;
+        OnMoneyChanged?.Invoke(money);
+    }
 
+    public void SpendResources(int amount)
+    {
+        money -= amount;
+        OnMoneyChanged?.Invoke(money);
+    }
 
-    public Func<float> GetCostModifier;
+    public void LoseLife(int count = 1)
+    {
+        lives -= count;
+        OnLivesChanged?.Invoke(lives);
+        if (lives <= 0) EndGame(false);
+    }
 
-
-    public void EnemyKilled() => OnEnemyKilled?.Invoke();
-    public void TowerBuilt() => OnTowerBuilt?.Invoke();
-    public void BaseDestroyed() => OnBaseDestroyed?.Invoke();
+    public void EndGame(bool win)
+    {
+        Debug.Log(win ? "Victory!" : "Defeat!");
+        Time.timeScale = 0;
+    }
 }
