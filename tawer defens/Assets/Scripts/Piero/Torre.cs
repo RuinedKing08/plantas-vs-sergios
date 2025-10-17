@@ -1,61 +1,100 @@
 ﻿using UnityEngine;
 
-public class Torre : MonoBehaviour
+public class Torre : BaseTower
 {
-    [SerializeField] private GameObject prefabBala;
-    [SerializeField] private Transform puntoDisparo;  
-    [SerializeField] private float rango = 15f;
-    [SerializeField] private float tiempoEntreDisparos = 1f;
+    [Header("Shooter Settings")]
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private float range = 15f;
+    [SerializeField] private float fireRate = 1f;
+    [SerializeField] private float baseDamage = 10f;
 
-    private float temporizador = 0f;
-    private Transform objetivo;
+    private float fireTimer = 0f;
+    private Transform currentTarget;
 
-    void Update()
+    protected override void Update()
     {
-        BuscarObjetivo();
+        if (isPreview) return; 
 
-        if (objetivo != null)
+        FindTarget();
+
+        if (currentTarget != null)
         {
-         
-            Vector3 direccion = objetivo.position - transform.position;
-            direccion.y = 0;
-            Quaternion rotacion = Quaternion.LookRotation(direccion);
-            transform.rotation = rotacion;
+            RotateToTarget();
 
-            temporizador += Time.deltaTime;
-            if (temporizador >= tiempoEntreDisparos)
+            fireTimer += Time.deltaTime;
+            if (fireTimer >= 1f / fireRate)
             {
-                Disparar();
-                temporizador = 0f;
-            }
-        }
-    }
-
-    void BuscarObjetivo()
-    {
-        GameObject[] enemigos = GameObject.FindGameObjectsWithTag("Enemy");
-
-        float distanciaMinima = Mathf.Infinity;
-        Transform enemigoCercano = null;
-
-        foreach (GameObject enemigo in enemigos)
-        {
-            float distancia = Vector3.Distance(transform.position, enemigo.transform.position);
-            if (distancia < distanciaMinima && distancia <= rango)
-            {
-                distanciaMinima = distancia;
-                enemigoCercano = enemigo.transform;
+                fireTimer = 0f;
+                Shoot();
             }
         }
 
-        objetivo = enemigoCercano;
+        base.Update();
     }
 
-    void Disparar()
+    private void FindTarget()
     {
-        if (prefabBala != null && puntoDisparo != null)
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        Transform target = null;
+        float first = -Mathf.Infinity;
+
+        foreach (GameObject enemy in enemies)
         {
-            Instantiate(prefabBala, puntoDisparo.position, puntoDisparo.rotation);
+            float distance = Vector3.Distance(transform.position, enemy.transform.position);
+            if (distance > range) continue; 
+
+            if (enemy.TryGetComponent(out BaseEnemy baseEnemy))
+            {
+                float progress = baseEnemy.PathProgress();
+                if (progress > first)
+                {
+                    first = progress;
+                    target = enemy.transform;
+                }
+            }
         }
+
+        currentTarget = target;
+    }
+
+    private void RotateToTarget()
+    {
+        Vector3 dir = currentTarget.position - transform.position;
+        dir.y = 0;
+        Quaternion look = Quaternion.LookRotation(dir);
+        transform.rotation = Quaternion.Lerp(transform.rotation, look, Time.deltaTime * 5f);
+    }
+
+    private void Shoot()
+    {
+        if (currentTarget == null) return;
+
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+
+        if (bullet.TryGetComponent(out Bala bala))
+        {
+            bala.Initialize(currentTarget, GetDamage(), range);
+        }
+    }
+
+    private float GetDamage()
+    {
+        return baseDamage * Mathf.Pow(1.25f, Level - 1);
+    }
+
+    public override void Upgrade()
+    {
+        base.Upgrade();
+
+        baseDamage *= 1.2f;
+        range += 1f;
+        fireRate += 0.2f;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, range);
     }
 }

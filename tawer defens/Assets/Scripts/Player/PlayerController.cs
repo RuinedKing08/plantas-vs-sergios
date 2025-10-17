@@ -41,19 +41,11 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        UpdateResourceUI();
 
         if (!isPlacing) return;
         HandlePlacement();
     }
 
-    private void UpdateResourceUI()
-    {
-        if (resourceText != null)
-        {
-            resourceText.text = $"$ {Game.Instance.money}";
-        }
-    }
 
     private void StartPlacement(GameObject prefab, int cost)
     {

@@ -77,11 +77,9 @@ public class TackShooterTower : BaseTower
         range += 0.3f;
     }
 
-#if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, range);
     }
-#endif
 }

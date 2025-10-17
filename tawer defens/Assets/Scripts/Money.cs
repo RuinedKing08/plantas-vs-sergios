@@ -4,7 +4,7 @@ using System.Collections;
 public class Money : MonoBehaviour
 {
     // cantidad de dinero
-    [SerializeField] private int amount = 0;
+    [SerializeField] private int income = 10;
 
     private void Start()
     {
@@ -20,25 +20,8 @@ public class Money : MonoBehaviour
             // 5 segundos
             yield return new WaitForSeconds(5f);
             // 1 dinero
-            amount += 1;
+            Game.Instance.AddResources(income);
         }
-    }
-
-    // funciones para ganar y gastar
-    public void Add(int value)
-    {
-        amount += value;
-    }
-
-    public bool Spend(int value)
-    {
-        if (amount >= value)
-        {
-            amount -= value;
-            //previene gastar mas de lo que se tiene
-            return true;
-        }
-        return false;
     }
 }
 

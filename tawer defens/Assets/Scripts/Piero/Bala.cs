@@ -2,23 +2,50 @@ using UnityEngine;
 
 public class Bala : MonoBehaviour
 {
-    [SerializeField] private float velocidad = 10f;
+    [SerializeField] private float speed = 25f;     
+    [SerializeField] private float turnSpeed = 10f;  
+    [SerializeField] private float lifetime = 4f;      
 
-    void Update()
+    private Transform target;
+    private float damage;
+    private Vector3 startPosition;
+    private float maxDistance;
+
+    public void Initialize(Transform targetTransform, float dmg, float range)
     {
-        transform.Translate(Vector3.forward * velocidad * Time.deltaTime);
+        target = targetTransform;
+        damage = dmg;
+        maxDistance = range;
+        startPosition = transform.position;
+
+        Destroy(gameObject, lifetime);
     }
 
-    void OnCollisionEnter(Collision colision)
+    private void Update()
     {
-        if (colision.gameObject.CompareTag("Enemy"))
+        if (target == null)
         {
-            Destroy(colision.gameObject);
-            Destroy(gameObject);           
+            Destroy(gameObject);
+            return;
         }
-        else
+
+        Vector3 dir = (target.position - transform.position).normalized;
+
+        Quaternion targetRot = Quaternion.LookRotation(dir);
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, turnSpeed * Time.deltaTime);
+
+        transform.Translate(Vector3.forward * speed * Time.deltaTime);
+
+        if (Vector3.Distance(startPosition, transform.position) > maxDistance)
+            Destroy(gameObject);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent(out Health health))
         {
-            Destroy(gameObject);         
+            health.TakeDamage(damage);
+            Destroy(gameObject);
         }
     }
 }

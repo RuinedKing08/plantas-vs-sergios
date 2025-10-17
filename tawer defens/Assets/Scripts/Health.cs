@@ -4,8 +4,6 @@ public class Health : MonoBehaviour, IDamageable
 {
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private float currentHealth;
-    [SerializeField] private bool destroyOnDeath = true;
-    [SerializeField] private bool isEnemy = false;
 
     public float CurrentHealth => currentHealth;
     public float MaxHealth=> maxHealth;

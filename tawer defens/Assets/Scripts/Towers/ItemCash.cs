@@ -11,7 +11,7 @@ public class ItemCash : MonoBehaviour
 
     private void OnMouseDown()
     {
-        Game.Instance.Money.Add(value);
+        Game.Instance.AddResources(value);
         Destroy(gameObject);
     }
 }

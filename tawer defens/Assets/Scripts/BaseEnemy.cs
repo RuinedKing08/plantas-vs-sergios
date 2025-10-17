@@ -22,18 +22,25 @@ public abstract class BaseEnemy : BaseUnit, IDamageable
     public void TakeDamage(float amount)
     {
         health.TakeDamage(amount);
+        if(health.CurrentHealth <= 0)
+        {
+            Game.Instance.AddResources(reward);
+            Destroy(gameObject);
+        }
     }
-
-
 
     protected void MoveAlongPath()
     {
         if (path == null || path.Length == 0) return;
-        if (currentWaypoint >= path.Length) return;
+        if (currentWaypoint >= path.Length)
+        {
+            ReachGoal();
+            return;
+        }
 
         Transform target = path[currentWaypoint];
         Vector3 dir = (target.position - transform.position).normalized;
-        transform.position += dir * moveSpeed * Time.deltaTime;
+        transform.position += dir * speed * Time.deltaTime;
 
         if (Vector3.Distance(transform.position, target.position) < 0.2f)
         {
@@ -46,10 +53,18 @@ public abstract class BaseEnemy : BaseUnit, IDamageable
         Game.Instance.LoseLife();
         Destroy(gameObject);
     }
-
-    private void HandleDeath()
+    public float PathProgress()
     {
-        Game.Instance.AddResources(reward);
-        Destroy(gameObject);
+
+         if (path == null || path.Length == 0) return 0f;
+
+
+         float progress = currentWaypoint;
+         if (currentWaypoint < path.Length)
+         {
+            float segmentDist = Vector3.Distance(transform.position, path[currentWaypoint].position);
+            progress += 1f - Mathf.Clamp01(segmentDist / 10f); 
+         }
+         return progress;
     }
 }
