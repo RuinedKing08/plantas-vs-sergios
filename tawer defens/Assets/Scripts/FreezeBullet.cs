@@ -7,14 +7,14 @@ public class FreezeBullet : MonoBehaviour
     [SerializeField] private float slowDuration = 2f;
 
     private float damage;
-    private GameObject target;
+    private Transform target;
     
     public void Initialize(float ds)
     {
         damage = ds;
     }
 
-    public void SetTarget(GameObject enemy)
+    public void SetTarget(Transform enemy)
     {
         target = enemy;
     }
@@ -26,12 +26,15 @@ public class FreezeBullet : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+
+
     }
 
     private void ShootEnemy()
     {
-        RageEnemy enemy = target.GetComponent<RageEnemy>();
-        if (enemy != null)
+        BaseEnemy enemy = target.GetComponent<BaseEnemy>();
+        if (enemy != null) 
         {
             enemy.TakeDamage(damage);
             enemy.Slow(slowAmount, slowDuration);

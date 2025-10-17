@@ -10,6 +10,7 @@ public class FreezeTower : BaseTower
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
     private float fireCountdown = 1f;
+    private Transform target;
 
     public delegate void ShootAction();
     private event ShootAction towershoot;
@@ -21,25 +22,45 @@ public class FreezeTower : BaseTower
 
     private void Update()
     {
+        FindTarget();
         fireCountdown -= Time.deltaTime;
 
         if (fireCountdown <= 0f)
         {
-            GameObject enemy = DetectEnemy();
-            if (enemy != null)
+            if (target != null)
             {
-                Shoot(enemy);
+                Shoot(target);
                 fireCountdown = 1f;
             }
         }
     }
 
-    private GameObject DetectEnemy()
+    private void FindTarget()
     {
-        return null;
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        Transform target1 = null;
+        float first = -Mathf.Infinity;
+
+        foreach (GameObject enemy in enemies)
+        {
+            float distance = Vector3.Distance(transform.position, enemy.transform.position);
+            if (distance > range) continue; 
+
+            if (enemy.TryGetComponent(out BaseEnemy baseEnemy))
+            {
+                float progress = baseEnemy.PathProgress();
+                if (progress > first)
+                {
+                    first = progress;
+                    target1 = enemy.transform;
+                }
+            }
+        }
+
+        target = target1;
     }
 
-    private void Shoot(GameObject enemy)
+    private void Shoot(Transform enemy)
     {
         GameObject freezeBullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         FreezeBullet bullet = freezeBullet.GetComponent<FreezeBullet>();
