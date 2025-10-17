@@ -7,7 +7,8 @@ public class Health : MonoBehaviour, IDamageable
     [SerializeField] private bool destroyOnDeath = true;
     [SerializeField] private bool isEnemy = false;
 
-
+    public float CurrentHealth => currentHealth;
+    public float MaxHealth=> maxHealth;
     public bool IsAlive => currentHealth > 0f;
 
 
