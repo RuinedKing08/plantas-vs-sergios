@@ -1,16 +1,18 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class FreezeTower : BaseTower
 {
     [SerializeField] private float range = 5f;
     [SerializeField] private float fireRate = 1f;
+    [SerializeField] private float damage = 3f;
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
     private float fireCountdown = 1f;
 
     public delegate void ShootAction();
-    private ShootAction towershoot;
+    private event ShootAction towershoot;
 
     private void Start()
     {
@@ -34,7 +36,6 @@ public class FreezeTower : BaseTower
 
     private GameObject DetectEnemy()
     {
-
         return null;
     }
 
@@ -42,6 +43,7 @@ public class FreezeTower : BaseTower
     {
         GameObject freezeBullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         FreezeBullet bullet = freezeBullet.GetComponent<FreezeBullet>();
+        bullet.Initialize(damage);
         
         if (bullet != null)
         {
