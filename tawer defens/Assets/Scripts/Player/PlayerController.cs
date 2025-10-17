@@ -70,6 +70,8 @@ public class PlayerController : MonoBehaviour
             Destroy(towerGhost);
 
         towerGhost = Instantiate(towerToPlace);
+        var tower = towerGhost.GetComponent<BaseTower>();
+        if (tower != null) tower.isPreview = true;
         SetGhostMaterial(validMat);
 
         isPlacing = true;
@@ -85,7 +87,7 @@ public class PlayerController : MonoBehaviour
             pos.y = yOffset;
             towerGhost.transform.position = pos;
 
-            bool valid = IsPlacementValid(hit.point);
+            bool valid = IsPlacementValid(hit.point, towerGhost);
             SetGhostMaterial(valid ? validMat : invalidMat);
 
             if (Input.GetMouseButtonDown(0) && valid)
@@ -105,7 +107,9 @@ public class PlayerController : MonoBehaviour
         if (towerToPlace == null) return;
 
         Game.Instance.SpendResources(currentCost);
-        Instantiate(towerToPlace, position, Quaternion.identity);
+        GameObject placed = Instantiate(towerToPlace, position, Quaternion.identity);
+        var tower = placed.GetComponent<BaseTower>();
+        tower.isPreview = false;
         Destroy(towerGhost);
         towerGhost = null;
         isPlacing = false;
@@ -118,12 +122,15 @@ public class PlayerController : MonoBehaviour
         isPlacing = false;
     }
 
-    private bool IsPlacementValid(Vector3 position)
+    private bool IsPlacementValid(Vector3 position, GameObject ghost)
     {
         Collider[] hits = Physics.OverlapSphere(position, 0.75f);
         foreach (var hit in hits)
         {
-            if (hit.CompareTag("Tower") || hit.CompareTag("Enemy"))
+            if (ghost != null && hit.transform.IsChildOf(ghost.transform))
+                continue;
+
+            if (hit.CompareTag("Tower") || hit.CompareTag("Enemy") || hit.CompareTag("Path"))
                 return false;
         }
         return true;
