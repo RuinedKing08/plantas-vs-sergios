@@ -15,6 +15,13 @@ public class Health : MonoBehaviour, IDamageable
         currentHealth = maxHealth;
     }
 
+    public void Initialize(float value)
+    {
+        maxHealth = value;
+        currentHealth = maxHealth;
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
 
     public void TakeDamage(float amount)
     {

@@ -3,6 +3,7 @@ using UnityEngine;
 public abstract class BaseEnemy : BaseUnit, IDamageable
 {
     [SerializeField] private float speed = 5f;
+    [SerializeField] private float baseHealth = 100f;
     [SerializeField] private int reward = 10;
     [SerializeField] private Transform[] path;
 
@@ -13,6 +14,8 @@ public abstract class BaseEnemy : BaseUnit, IDamageable
     private void Awake()
     {
         health = GetComponent<Health>();
+        float scaledHealth = baseHealth * EnemyStats.GlobalHealthMultiplier;
+        health.Initialize(scaledHealth);
     }
 
     protected virtual void Update()
