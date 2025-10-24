@@ -31,7 +31,7 @@ public abstract class BaseTower : MonoBehaviour, IUpgradable
 
     public virtual void Initialize() { }
 
-    private void Start()
+    protected virtual void Start()
     {
         if (upgradeCanvas != null)
             upgradeCanvas.gameObject.SetActive(false);

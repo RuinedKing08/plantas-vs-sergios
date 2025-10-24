@@ -13,11 +13,14 @@ public abstract class BaseEnemy : BaseUnit, IDamageable
     public bool IsAlive => health.IsAlive;
     public float Speed => speed;
 
-    private void Awake()
+    public override void Initialize()
     {
         health = GetComponent<Health>();
         float scaledHealth = baseHealth * EnemyStats.GlobalHealthMultiplier;
         health.Initialize(scaledHealth);
+        path = PathManager.Instance.Waypoints;
+        base.Initialize();
+
     }
 
     protected virtual void Update()
@@ -37,7 +40,6 @@ public abstract class BaseEnemy : BaseUnit, IDamageable
 
     protected void MoveAlongPath()
     {
-        if (path == null || path.Length == 0) return;
         if (currentWaypoint >= path.Length)
         {
             ReachGoal();

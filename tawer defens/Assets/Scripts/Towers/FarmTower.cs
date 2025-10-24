@@ -4,12 +4,13 @@ using System.Collections;
 public class FarmTower : BaseTower
 {
     [SerializeField] private GameObject moneyPrefab;
-    [SerializeField] private float spawnRange = 2f; 
+    [SerializeField] private float spawnRange = 2f;
     [SerializeField] private float spawnTime = 10f;
     [SerializeField] private int cashMoney = 20;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start(); 
         StartCoroutine(SpawnMoney());
     }
 
@@ -24,15 +25,15 @@ public class FarmTower : BaseTower
 
     private void SpawnMoneyCube()
     {
-        Vector3 randomPos = transform.position + new Vector3(Random.Range(-spawnRange, spawnRange),0.5f,Random.Range(-spawnRange, spawnRange));
+        Vector3 randomPos = transform.position + new Vector3(Random.Range(-spawnRange, spawnRange), 0.5f, Random.Range(-spawnRange, spawnRange));
         GameObject cash = Instantiate(moneyPrefab, randomPos, Quaternion.identity);
-        ItemCash moneyCube = cash.GetComponent<ItemCash>();
-        moneyCube.Initialize(cashMoney);
+        if (cash.TryGetComponent(out ItemCash moneyCube))
+            moneyCube.Initialize(cashMoney);
     }
 
     public override void Upgrade()
     {
-        spawnTime -= 0.5f;
+        spawnTime = Mathf.Max(1f, spawnTime - 0.5f);
         cashMoney += 5;
         base.Upgrade();
     }

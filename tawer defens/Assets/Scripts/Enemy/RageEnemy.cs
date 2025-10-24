@@ -32,4 +32,5 @@ public class RageEnemy : BaseEnemy
 
         base.Update();
     }
+
 }

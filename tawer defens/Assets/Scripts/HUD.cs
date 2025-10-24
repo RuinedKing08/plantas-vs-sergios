@@ -7,6 +7,12 @@ public class HUD : MonoBehaviour
     [SerializeField] private TMP_Text livesText;
     [SerializeField] private TMP_Text timerText;
 
+    private void Start()
+    {
+        if (Timer.Instance != null)
+            Timer.Instance.OnSecondTick += UpdateTimer;
+    }
+
     private void OnEnable()
     {
         if (Game.Instance != null)

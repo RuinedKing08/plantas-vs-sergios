@@ -23,7 +23,7 @@ public class Game : MonoBehaviour
     public UnityEvent<int> LivesEvent;
     //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
-    private void Awake()
+    private void Start()
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
@@ -83,5 +83,28 @@ public class Game : MonoBehaviour
     {
         AddResources(reward);
         OnEnemyKilled?.Invoke(reward);
+    }
+
+    //Difficulty
+
+    private void OnEnable()
+    {
+        if (Timer.Instance != null)
+            Timer.Instance.OnMinutePassed += HandleMinutePassed;
+    }
+
+    private void OnDisable()
+    {
+        if (Timer.Instance != null)
+            Timer.Instance.OnMinutePassed -= HandleMinutePassed;
+    }
+
+    private void HandleMinutePassed(int minutes)
+    {
+        if (minutes % 2 == 0)
+        {
+            EnemyStats.GlobalHealthMultiplier += 0.2f;
+            Debug.Log($"Enemy HP multiplier increased to {EnemyStats.GlobalHealthMultiplier:F2}");
+        }
     }
 }

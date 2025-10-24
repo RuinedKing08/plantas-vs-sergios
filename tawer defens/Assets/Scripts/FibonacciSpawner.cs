@@ -1,17 +1,20 @@
+using System.Collections;
 using UnityEngine;
 
 public class FibonacciSpawner : MonoBehaviour
 {
     [Header("Prefab y punto de spawn")]
-    public GameObject unidadPrefab;   // Prefab que se va a instanciar
+    public GameObject[] unidadPrefab;   // Prefab que se va a instanciar
     public GameObject puntoSpawn;     // Cualquier objeto de la jerarquía o prefab
 
     [Header("Configuración")]
     public float intervalo = 10f;     // Cada cuántos segundos se genera una nueva cantidad
+    [SerializeField] private float spawnDelay = 0.5f;
 
     private int indice = 0;           // Posición en la serie de Fibonacci
     private float tiempoSiguiente;    // Próximo instante de spawn
     private int[] fibCache = new int[100];
+    private bool spawningWave = false;
 
     void Start()
     {
@@ -20,12 +23,14 @@ public class FibonacciSpawner : MonoBehaviour
         fibCache[1] = 1;
     }
 
-    void Update()
+
+    private void Update()
     {
-        if (Time.time >= tiempoSiguiente)
+        if (!spawningWave && Time.time >= tiempoSiguiente)
         {
             int cantidad = Fibonacci(indice);
-            CrearUnidades(cantidad);
+            StartCoroutine(SpawnWave(cantidad));
+
             indice++;
             tiempoSiguiente += intervalo;
         }
@@ -39,19 +44,32 @@ public class FibonacciSpawner : MonoBehaviour
         return fibCache[n];
     }
 
-    void CrearUnidades(int cantidad)
+    private IEnumerator SpawnWave(int cantidad)
     {
-        if (unidadPrefab == null || puntoSpawn == null)
+        if (unidadPrefab == null || unidadPrefab.Length == 0 || puntoSpawn == null)
         {
-            Debug.LogWarning("Asigna el prefab y el punto de spawn en el inspector.");
-            return;
+            yield break;
         }
+
+        spawningWave = true;
+        Debug.Log($"[FibonacciSpawner] Iniciando oleada {indice} ({cantidad} enemigos).");
 
         for (int i = 0; i < cantidad; i++)
         {
-            Instantiate(unidadPrefab, puntoSpawn.transform.position, Quaternion.identity);
+            int r = Random.Range(0, unidadPrefab.Length);
+            GameObject prefab = unidadPrefab[r];
+
+            GameObject clone = Instantiate(prefab, puntoSpawn.transform.position, Quaternion.identity);
+
+            if (clone.TryGetComponent(out BaseEnemy be))
+            {
+                be.Initialize();
+            }
+
+            yield return new WaitForSeconds(spawnDelay);
         }
 
-        Debug.Log($"[FibonacciSpawner] Segundo {(int)tiempoSiguiente}: creadas {cantidad} unidades (índice {indice}).");
+        spawningWave = false;
+        Debug.Log($"[FibonacciSpawner] Oleada {indice} completada ({cantidad} enemigos generados).");
     }
 }
