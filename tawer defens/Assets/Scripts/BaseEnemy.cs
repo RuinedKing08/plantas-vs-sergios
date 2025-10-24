@@ -11,6 +11,7 @@ public abstract class BaseEnemy : BaseUnit, IDamageable
     protected Health health;
 
     public bool IsAlive => health.IsAlive;
+    public float Speed => speed;
     private void Awake()
     {
         health = GetComponent<Health>();

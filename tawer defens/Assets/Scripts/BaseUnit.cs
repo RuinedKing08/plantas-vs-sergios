@@ -12,8 +12,4 @@ public abstract class BaseUnit : MonoBehaviour, IUnit
     public virtual void Initialize() { }
 
 
-    protected void Move(Vector3 direction)
-    {
-        transform.position += direction.normalized * moveSpeed * Time.deltaTime;
-    }
 }

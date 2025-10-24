@@ -7,8 +7,6 @@ public class RageEnemy : BaseEnemy
     [SerializeField] private float maxSpeed = 8f;   
     [SerializeField] private Color rageColor = Color.red;
     [SerializeField] private Renderer bodyRenderer;
-
-
     public override void Initialize()
     {
         base.Initialize();

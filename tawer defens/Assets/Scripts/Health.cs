@@ -10,16 +10,10 @@ public class Health : MonoBehaviour, IDamageable
     public bool IsAlive => currentHealth > 0f;
 
 
-    private void Awake()
-    {
-        currentHealth = maxHealth;
-    }
-
     public void Initialize(float value)
     {
         maxHealth = value;
         currentHealth = maxHealth;
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
 
