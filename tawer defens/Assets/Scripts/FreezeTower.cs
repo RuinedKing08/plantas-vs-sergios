@@ -48,12 +48,12 @@ public class FreezeTower : BaseTower
 
             if (enemy.TryGetComponent(out BaseEnemy baseEnemy))
             {
-                float progress = baseEnemy.PathProgress();
-                if (progress > first)
-                {
-                    first = progress;
-                    target1 = enemy.transform;
-                }
+                //float progress = baseEnemy.PathProgress();
+                //if (progress > first)
+                //{
+                //    first = progress;
+                //    target1 = enemy.transform;
+                //}
             }
         }
 
