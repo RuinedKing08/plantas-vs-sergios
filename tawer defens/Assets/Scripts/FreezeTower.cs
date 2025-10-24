@@ -9,65 +9,64 @@ public class FreezeTower : BaseTower
     [SerializeField] private float damage = 3f;
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
-    private float fireCountdown = 1f;
+
+    private float fireCountdown;
     private Transform target;
 
     public delegate void ShootAction();
     private event ShootAction towershoot;
 
-    private void Start()
+    protected override void Start()
     {
-        towershoot += () => Debug.Log("La torre disparó");
+        base.Start();
+        fireCountdown = 1f / fireRate;
     }
 
-    private void Update()
+    protected override void Update()
     {
         FindTarget();
         fireCountdown -= Time.deltaTime;
 
-        if (fireCountdown <= 0f)
+        if (target != null && fireCountdown <= 0f)
         {
-            if (target != null)
-            {
-                Shoot(target);
-                fireCountdown = 1f;
-            }
+            Shoot(target);
+            fireCountdown = 1f / fireRate;
         }
+
+        base.Update();
     }
 
     private void FindTarget()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        Transform target1 = null;
-        float first = -Mathf.Infinity;
+        Transform firstEnemy = null;
+        float bestProgress = -Mathf.Infinity;
 
         foreach (GameObject enemy in enemies)
         {
             float distance = Vector3.Distance(transform.position, enemy.transform.position);
-            if (distance > range) continue; 
+            if (distance > range) continue;
 
             if (enemy.TryGetComponent(out BaseEnemy baseEnemy))
             {
-                //float progress = baseEnemy.PathProgress();
-                //if (progress > first)
-                //{
-                //    first = progress;
-                //    target1 = enemy.transform;
-                //}
+                float progress = baseEnemy.PathProgress();
+                if (progress > bestProgress)
+                {
+                    bestProgress = progress;
+                    firstEnemy = enemy.transform;
+                }
             }
         }
 
-        target = target1;
+        target = firstEnemy;
     }
 
     private void Shoot(Transform enemy)
     {
         GameObject freezeBullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-        FreezeBullet bullet = freezeBullet.GetComponent<FreezeBullet>();
-        bullet.Initialize(damage);
-        
-        if (bullet != null)
+        if (freezeBullet.TryGetComponent(out FreezeBullet bullet))
         {
+            bullet.Initialize(damage);
             bullet.SetTarget(enemy);
         }
 

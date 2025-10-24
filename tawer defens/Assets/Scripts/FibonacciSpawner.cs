@@ -4,15 +4,15 @@ using UnityEngine;
 public class FibonacciSpawner : MonoBehaviour
 {
     [Header("Prefab y punto de spawn")]
-    public GameObject[] unidadPrefab;   // Prefab que se va a instanciar
-    public GameObject puntoSpawn;     // Cualquier objeto de la jerarquía o prefab
+    public GameObject[] unidadPrefab; 
+    public GameObject puntoSpawn;  
 
     [Header("Configuración")]
-    public float intervalo = 10f;     // Cada cuántos segundos se genera una nueva cantidad
+    public float intervalo = 10f;   
     [SerializeField] private float spawnDelay = 0.5f;
 
-    private int indice = 0;           // Posición en la serie de Fibonacci
-    private float tiempoSiguiente;    // Próximo instante de spawn
+    private int indice = 0;      
+    private float tiempoSiguiente;  
     private int[] fibCache = new int[100];
     private bool spawningWave = false;
 
@@ -52,7 +52,6 @@ public class FibonacciSpawner : MonoBehaviour
         }
 
         spawningWave = true;
-        Debug.Log($"[FibonacciSpawner] Iniciando oleada {indice} ({cantidad} enemigos).");
 
         for (int i = 0; i < cantidad; i++)
         {
@@ -70,6 +69,5 @@ public class FibonacciSpawner : MonoBehaviour
         }
 
         spawningWave = false;
-        Debug.Log($"[FibonacciSpawner] Oleada {indice} completada ({cantidad} enemigos generados).");
     }
 }

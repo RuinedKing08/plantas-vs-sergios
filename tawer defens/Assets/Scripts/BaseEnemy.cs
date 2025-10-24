@@ -11,7 +11,7 @@ public abstract class BaseEnemy : BaseUnit, IDamageable
     protected Health health;
 
     public bool IsAlive => health.IsAlive;
-    public float Speed => speed;
+    public float Speed {get => speed; set => speed = value; }
 
     public override void Initialize()
     {
