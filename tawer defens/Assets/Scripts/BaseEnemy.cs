@@ -2,7 +2,7 @@ using UnityEngine;
 
 public abstract class BaseEnemy : BaseUnit, IDamageable
 {
-    [SerializeField] private float speed = 5f;
+    [SerializeField] protected float speed = 5f;
     [SerializeField] private float baseHealth = 100f;
     [SerializeField] private int reward = 10;
     [SerializeField] private Transform[] path;
@@ -12,6 +12,7 @@ public abstract class BaseEnemy : BaseUnit, IDamageable
 
     public bool IsAlive => health.IsAlive;
     public float Speed => speed;
+
     private void Awake()
     {
         health = GetComponent<Health>();
@@ -23,10 +24,11 @@ public abstract class BaseEnemy : BaseUnit, IDamageable
     {
         MoveAlongPath();   
     }
-    public void TakeDamage(float amount)
+
+    public virtual void TakeDamage(float amount)
     {
         health.TakeDamage(amount);
-        if(health.CurrentHealth <= 0)
+        if (health.CurrentHealth <= 0)
         {
             Game.Instance.AddResources(reward);
             Destroy(gameObject);
@@ -57,18 +59,16 @@ public abstract class BaseEnemy : BaseUnit, IDamageable
         Game.Instance.LoseLife();
         Destroy(gameObject);
     }
+
     public float PathProgress()
     {
-
-         if (path == null || path.Length == 0) return 0f;
-
-
-         float progress = currentWaypoint;
-         if (currentWaypoint < path.Length)
-         {
+        if (path == null || path.Length == 0) return 0f;
+        float progress = currentWaypoint;
+        if (currentWaypoint < path.Length)
+        {
             float segmentDist = Vector3.Distance(transform.position, path[currentWaypoint].position);
             progress += 1f - Mathf.Clamp01(segmentDist / 10f); 
-         }
-         return progress;
+        }
+        return progress;
     }
 }

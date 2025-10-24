@@ -9,43 +9,47 @@ public class HUD : MonoBehaviour
 
     private void OnEnable()
     {
-        if (Game.Instance == null) return;
-        Game.Instance.OnMoneyChanged += UpdateMoney;
-        Game.Instance.OnLivesChanged += UpdateLives;
+        if (Game.Instance != null)
+        {
+            Game.Instance.OnMoneyChanged += UpdateMoney;
+            Game.Instance.OnLivesChanged += UpdateLives;
+            UpdateMoney(Game.Instance.Money);
+            UpdateLives(Game.Instance.Lives);
+        }
 
-        UpdateMoney(Game.Instance.Money);
-        UpdateLives(Game.Instance.Lives);
-        Timer.Instance.OnSecondTick += UpdateTimer;
-    }
-
-    private void Start()
-    {
-        if (Game.Instance == null) return;
-
-        Game.Instance.OnMoneyChanged += UpdateMoney;
-        Game.Instance.OnLivesChanged += UpdateLives;
-
-        UpdateMoney(Game.Instance.Money);
-        UpdateLives(Game.Instance.Lives);
+        if (Timer.Instance != null)
+            Timer.Instance.OnSecondTick += UpdateTimer;
     }
 
     private void OnDisable()
     {
-        Game.Instance.OnMoneyChanged -= UpdateMoney;
-        Game.Instance.OnLivesChanged -= UpdateLives;
-        Timer.Instance.OnSecondTick -= UpdateTimer;
-    }
+        if (Game.Instance != null)
+        {
+            Game.Instance.OnMoneyChanged -= UpdateMoney;
+            Game.Instance.OnLivesChanged -= UpdateLives;
+        }
 
+        if (Timer.Instance != null)
+            Timer.Instance.OnSecondTick -= UpdateTimer;
+    }
 
     private void UpdateTimer(float time)
     {
         if (timerText == null) return;
-
         int minutes = Mathf.FloorToInt(time / 60f);
         int seconds = Mathf.FloorToInt(time % 60);
         timerText.text = $"time: {minutes:00}:{seconds:00}";
     }
 
-    private void UpdateMoney(int value) => moneyText.text = $"money: ${value}";
-    private void UpdateLives(int value) => livesText.text = $"lives: {value}";
+    private void UpdateMoney(int value)
+    {
+        if (moneyText != null)
+            moneyText.text = $"money: ${value}";
+    }
+
+    private void UpdateLives(int value)
+    {
+        if (livesText != null)
+            livesText.text = $"lives: {value}";
+    }
 }
